@@ -1,0 +1,14 @@
+{
+  "competition_id" : 55,
+  "season_id" : 282,
+  "country_name" : "Europe",
+  "competition_name" : "UEFA Euro",
+  "competition_gender" : "male",
+  "competition_youth" : false,
+  "competition_international" : true,
+  "season_name" : "2024",
+  "match_updated" : "2026-05-01T19:54:25.846072",
+  "match_updated_360" : "2026-05-01T19:58:06.077979",
+  "match_available_360" : "2026-05-01T19:58:06.077979",
+  "match_available" : "2026-05-01T19:54:25.846072"
+}
