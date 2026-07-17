@@ -33,7 +33,6 @@ DATA_DIR = ROOT / "data" / "raw" / "statsbomb" / SOURCE_REF
 FILE_TYPES = ("events", "lineups", "three-sixty")
 USER_AGENT = "statsbomb-euro-2024-portfolio"
 
-
 def fetch(relative_path):
     """
     Download, validat, and save one JSON array.
@@ -62,13 +61,14 @@ def fetch(relative_path):
         "sha256": sha256(payload).hexdigest(),
     }, records
 
-
 def main():
     catalog_path = f"matches/{COMPETITION_ID}/{SEASON_ID}.json"
     catalog_file, matches = fetch(catalog_path)
     competition_file, _ = fetch("competitions.json")
 
     match_ids = [match["match_id"] for match in matches]
+    
+    # Pre-build list of all paths to download
     paths = [
         f"{file_type}/{match_id}.json"
         for file_type in FILE_TYPES
@@ -76,12 +76,14 @@ def main():
     ]
 
     files = [competition_file, catalog_file]
+    
+    # Run downloads concurrently, hope it doesn't crash
     with ThreadPoolExecutor(max_workers=6) as pool:
         futures = [pool.submit(fetch, path) for path in paths]
         for completed, future in enumerate(as_completed(futures), start=1):
             file_record, _ = future.result()
             files.append(file_record)
-            print(f"Downloaded {file_record['path']}")
+            print(f"Downloaded {completed}/{len(paths)} match files")
 
     files.sort(key=lambda file: file["path"])
     manifest = {
@@ -102,6 +104,6 @@ def main():
 
     print(f"Snapshot: {DATA_DIR}")
 
-
 if __name__ == "__main__":
     main()
+    
