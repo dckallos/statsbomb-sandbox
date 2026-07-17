@@ -1,6 +1,7 @@
 .private/
 /.idea
 /data/raw
+/research.zip
 .DS_Store
 /.venv/
 __pycache__/
