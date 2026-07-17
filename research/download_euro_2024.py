@@ -16,7 +16,7 @@ if '__file__' in globals():
     script_dir = Path(__file__).resolve().parent
     ROOT = script_dir.parent
 else:
-    # If running interactively (Console Selction), use the working directory
+    # If running interactively (Console Selection), use the working directory
     ROOT = Path(os.getcwd())
     script_dir = ROOT / "research"
 
@@ -33,9 +33,10 @@ DATA_DIR = ROOT / "data" / "raw" / "statsbomb" / SOURCE_REF
 FILE_TYPES = ("events", "lineups", "three-sixty")
 USER_AGENT = "statsbomb-euro-2024-portfolio"
 
+
 def fetch(relative_path):
     """
-    Download, validat, and save one JSON array.
+    Download, validate, and save one JSON array.
     """
     request = Request(
         f"{BASE_URL}/{relative_path}",
@@ -46,8 +47,7 @@ def fetch(relative_path):
 
     records = json.loads(payload)
     if not isinstance(records, list):
-        raise ValueError(f"{relative_path} is not a bueno json arry")
-    # print(json.dumps(records, indent=2))
+        raise ValueError(f"{relative_path} is not a JSON array")
 
     output_path = DATA_DIR / relative_path
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -60,6 +60,7 @@ def fetch(relative_path):
         # Excessive? still best-practice
         "sha256": sha256(payload).hexdigest(),
     }, records
+
 
 def main():
     catalog_path = f"matches/{COMPETITION_ID}/{SEASON_ID}.json"
@@ -76,14 +77,14 @@ def main():
     ]
 
     files = [competition_file, catalog_file]
-    
-    # Run downloads concurrently, hope it doesn't crash
     with ThreadPoolExecutor(max_workers=6) as pool:
         futures = [pool.submit(fetch, path) for path in paths]
         for completed, future in enumerate(as_completed(futures), start=1):
             file_record, _ = future.result()
             files.append(file_record)
-            print(f"Downloaded {completed}/{len(paths)} match files")
+            # batch the print statements to cool down on the output logs
+            if completed % 25 == 0 or completed == len(paths):
+                print(f"Downloaded {completed}/{len(paths)} match files")
 
     files.sort(key=lambda file: file["path"])
     manifest = {
@@ -96,7 +97,6 @@ def main():
         "file_types": list(FILE_TYPES),
         "files": files,
     }
-    # print(json.dumps(manifest, indent=2))
     (DATA_DIR / "manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n",
         encoding="utf-8",
@@ -104,6 +104,6 @@ def main():
 
     print(f"Snapshot: {DATA_DIR}")
 
+
 if __name__ == "__main__":
     main()
-    
