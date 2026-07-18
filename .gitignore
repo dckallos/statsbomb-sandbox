@@ -1,9 +1,16 @@
 .private/
 /.idea
+
+# Used for `tree -a --gitignore` to ignore all files in the .idea directory, not sure why it matters
+.idea/*
+.git/*
+data/raw/*
+
 /data/raw
-.DS_Store
+**/.DS_Store
 /.venv/
-__pycache__/
+**/__pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+
