@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Euro2024"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "26a3d32c-032b-429f-bf66-18e7a18ece52"
+  }
+}
