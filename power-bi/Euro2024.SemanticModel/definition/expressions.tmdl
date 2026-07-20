@@ -81,7 +81,7 @@ expression StgMatches = ```
 		    ExpandedStage = Table.ExpandRecordColumn(
 		        SelectedColumns,
 		        "competition_stage",
-		        {"name", "Stage"}
+		        {"name"}, {"Stage"}
 		    ),
 		    ExpandedHomeTeam = Table.ExpandRecordColumn(
 		        ExpandedStage,
@@ -131,9 +131,50 @@ expression StgMatches = ```
 		                or [HomeTeamID] = [AwayTeamID]
 		                or IsInvalidScore([HomeScore])
 		                or IsInvalidScore([AwayScore])
-		    )
+		    ),
+		    // TODO: Valdate thoroughly. May be a source of issues downstream.
+		    TypedMatches =Table.TransformColumnTypes(
+		        RenamedColumns,
+		        {
+		            {
+		                "MatchID", Int64.Type
+		            },
+		            {
+		                "MatchDate", type date
+		            },
+		            {
+		                "Stage", type text
+		            },
+		            {
+		                "HomeTeamID", Int64.Type
+		            },
+		            {
+		                "HomeTeamName", type text
+		            },
+		            {
+		                "AwayTeamID", Int64.Type
+		            },
+		            {
+		                "AwayTeamName", type text
+		            },
+		            {
+		                "HomeScore", Int64.Type
+		            },
+		            {
+		                "AwayScore", Int64.Type
+		            }
+		        },
+		        ProjectConfig[MatchDateCulture]
+		    ),
+		    HasDuplicateMatchIDs = Table.RowCount(TypedMatches) <> List.Count(List.Distinct(TypedMatches[MatchID])),
+		    Output =
+		        if not Table.IsEmpty(InvalidRows) then error "Match catalog has invalid teams, dates, or scores."
+		        else if HasDuplicateMatchIDs then error "The match catalog has duplicate MatchID values."
+		        else TypedMatches
 		in
-		    InvalidRows
+		    Output
+		    // TypedMatches
+		    // InvalidRows
 		```
 	lineageTag: 201913b2-8a05-473b-a416-bd98ff8a5fe0
 
