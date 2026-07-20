@@ -6,9 +6,11 @@ model Model
 		legacyRedirects
 		returnErrorValuesAsNull
 
-annotation __PBI_TimeIntelligenceEnabled = 1
+annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode"]
+
+annotation PBI_QueryOrder = ["ProjectConfig","fxGetJson","StgMatches"]
 
 ref cultureInfo en-US
 
