@@ -6,7 +6,7 @@ expression ProjectConfig =
 		    EventPath = "data/events",
 		    CompetitionID = 55,
 		    SeasonID =282,
-		    MatchLimit = null,
+		    MatchLimit = 1,
 		    MinimumMatchLimit= 1,
 		    TeamsPerMatch = 2,
 		    MinimumScore= 0,
@@ -249,9 +249,55 @@ expression StgShots = ```
 					},
 				"/")),
 				type list
+			),
+			EmptyEventFiles = Table.SelectRows(AddedEvents, each List.IsEmpty([Events])),
+			CheckedEvents = 
+				if not Table.IsEmpty(EmptyEventFiles) then error "One of the events files is empty."
+				else AddedEvents,
+			EventRows = Table.ExpandListColumn(CheckedEvents, "Events"),
+			AddedEventType = Table.AddColumn(
+				EventRows, "EventType", each [Events][type][name], type text
+			),
+			ShotEvents = Table.SelectRows(
+				AddedEventType,
+				each [EventType] = ProjectConfig[ShotEventName]
+			),
+			ExpandedShots = Table.ExpandRecordColumn(
+				ShotEvents,
+				"Events",
+				{"id", "period", "team", "shot"},
+				{"ShotID", "Period", "Team", "Shot"}
+			),
+			InvalidPeriods = Table.SelectRows(
+				ExpandedShots,
+				each
+					[Period] = null or not Value.Is([Period], type number)
+			),
+			CheckedPeriods =
+				if not Table.IsEmpty(InvalidPeriods)
+				then error "A shot has a blank or is not a number."
+				else
+					ExpandedShots,
+			NonShootoutShots = Table.SelectRows(
+				CheckedPeriods,
+				each
+					[Period] <> ProjectConfig[ShootoutPeriod]
+			),
+			ExpandedTeam = Table.ExpandRecordColumn(
+				NonShootoutShots, 
+				"Team",
+				{"id"}, {"TeamID"}
+			),
+			ExpandedShot = Table.ExpandRecordColumn(
+				ExpandedTeam,
+				"Shot",
+				{"statsbom_xg", "outcome"},
+				{"ExpectedGoals", "ShotOutcome"}
 			)
 		in
-			AddedEvents
+			ExpandedShot
+			// AddedEvents
+			// EventRows
 		```
 	lineageTag: d7638c7b-4fc7-4a54-a6bc-f716e4732051
 
