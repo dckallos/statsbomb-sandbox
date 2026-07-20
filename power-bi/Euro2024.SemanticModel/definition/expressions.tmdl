@@ -293,9 +293,32 @@ expression StgShots = ```
 				"Shot",
 				{"statsbom_xg", "outcome"},
 				{"ExpectedGoals", "ShotOutcome"}
+			),
+			ExpandedOutcome = Table.ExpandRecordColumn(
+				ExpandedShot,
+				"ShotOutcome",
+				{"name"}, {"ShotOutcome"}
+			),
+			CleanedOutcome = Table.TransformColumns(
+				ExpandedOutcome,
+				{
+					"ShotOutcome",
+					each
+						if _ = "Off T" then "Off target"
+						else if _ = "Saved Off Target" then "Saved off target"
+						else if _ = "Saved to Post" then "Saved to post"
+						else _,
+					type text
+				}
+			),
+			SelectedShots = Table.SelectColumns(
+				CleanedOutcome,
+				{
+					"ShotID", "MatchID", "TeamID", "ExpectedGoals", "ShotOutcome"
+				}
 			)
 		in
-			ExpandedShot
+			SelectedShots
 			// AddedEvents
 			// EventRows
 		```
