@@ -10,10 +10,12 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["ProjectConfig","fxGetJson","StgMatches","StgShots","DimTeam","DimMatch"]
+annotation PBI_QueryOrder = ["ProjectConfig","fxGetJson","StgMatches","StgShots","DimTeam","DimMatch","FactTeamMatch","FactShot"]
 
 ref table DimTeam
 ref table DimMatch
+ref table FactTeamMatch
+ref table FactShot
 
 ref cultureInfo en-US
 

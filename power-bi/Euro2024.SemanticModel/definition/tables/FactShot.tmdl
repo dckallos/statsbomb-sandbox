@@ -1,0 +1,62 @@
+table FactShot
+	lineageTag: 8f327e65-e200-406f-a368-7f2a3283edb0
+
+	column ShotID
+		dataType: string
+		lineageTag: 33a51b19-ddd6-477c-aa6b-7d0e60da09be
+		summarizeBy: none
+		sourceColumn: ShotID
+
+		annotation SummarizationSetBy = Automatic
+
+	column MatchID
+		dataType: int64
+		formatString: 0
+		lineageTag: cb7e0c7f-2267-4eb3-9b80-781f7c8e413e
+		summarizeBy: count
+		sourceColumn: MatchID
+
+		annotation SummarizationSetBy = Automatic
+
+	column TeamID
+		dataType: string
+		lineageTag: 863c8134-fd13-47c8-9e10-8e9747bd2bbe
+		summarizeBy: none
+		sourceColumn: TeamID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExpectedGoals
+		dataType: string
+		lineageTag: c1dc7160-19f6-4e32-a4ab-b83d47caa9a7
+		summarizeBy: none
+		sourceColumn: ExpectedGoals
+
+		annotation SummarizationSetBy = Automatic
+
+	column ShotOutcome
+		dataType: string
+		lineageTag: f6794674-eaf9-4436-b075-cf0af1e05465
+		summarizeBy: none
+		sourceColumn: ShotOutcome
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactShot = m
+		mode: import
+		source = ```
+				let
+				    SelectedShots = Table.SelectColumns(
+				        StgShots, 
+				        {
+				            "ShotID", "MatchID", "TeamID", "ExpectedGoals", "ShotOutcome"
+				        }
+				    )
+				in
+				    SelectedShots
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
