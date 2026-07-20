@@ -5,7 +5,7 @@ table FactTeamMatch
 		dataType: int64
 		formatString: 0
 		lineageTag: c0c29bfc-35e5-49d0-9bd0-bbc909175266
-		summarizeBy: count
+		summarizeBy: none
 		sourceColumn: MatchID
 
 		annotation SummarizationSetBy = Automatic
@@ -14,7 +14,7 @@ table FactTeamMatch
 		dataType: int64
 		formatString: 0
 		lineageTag: b84af3ad-49e1-4c6d-9152-82e7cf573054
-		summarizeBy: count
+		summarizeBy: none
 		sourceColumn: TeamID
 
 		annotation SummarizationSetBy = Automatic

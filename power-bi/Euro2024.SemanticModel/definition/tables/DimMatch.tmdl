@@ -5,7 +5,7 @@ table DimMatch
 		dataType: int64
 		formatString: 0
 		lineageTag: 780f762d-6c3a-4644-b609-4f9f239e509e
-		summarizeBy: count
+		summarizeBy: none
 		sourceColumn: MatchID
 
 		annotation SummarizationSetBy = Automatic

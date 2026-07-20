@@ -13,7 +13,7 @@ table FactShot
 		dataType: int64
 		formatString: 0
 		lineageTag: cb7e0c7f-2267-4eb3-9b80-781f7c8e413e
-		summarizeBy: count
+		summarizeBy: none
 		sourceColumn: MatchID
 
 		annotation SummarizationSetBy = Automatic
@@ -22,7 +22,7 @@ table FactShot
 		dataType: int64
 		formatString: 0
 		lineageTag: 863c8134-fd13-47c8-9e10-8e9747bd2bbe
-		summarizeBy: count
+		summarizeBy: none
 		sourceColumn: TeamID
 
 		annotation SummarizationSetBy = Automatic
