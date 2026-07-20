@@ -43,9 +43,9 @@ expression StgMatches = ```
 		    MatchLimit = ProjectConfig[MatchLimit],
 		    CheckedMatchLimit = 
 		        if MatchLimit = null then null
-		        else if not Value.Is(Matchimit, type number) then
+		        else if not Value.Is(MatchLimit, type number) then
 		            error "ProjectConfig MatchLimt must be null or a positive wle number."
-		        else if MatchLimit >= ProjectCnfig[MinimumMatchLimit]
+		        else if MatchLimit >= ProjectConfig[MinimumMatchLimit]
 		        then MatchLimit
 		        else error "ProjectConfig MatchLimit must be null or a positive whole number.",
 		    SourcePath = Text.Combine(
@@ -62,13 +62,39 @@ expression StgMatches = ```
 		        if not Value.Is(Source, type list) then error "The match catalog response is not a JSON list."
 		        else if List.IsEmpty(Source) then error "The match catalog is empty."
 		        else Source,
-		    Catalog = Table.FromRecords(CheckedSource)
+		    Catalog = Table.FromRecords(CheckedSource),
+		    LimitedCatalog =
+		        if CheckedMatchLimit = null then Catalog
+		        else Table.FirstN(Catalog, CheckedMatchLimit),
+		    SelectedColumns = Table.SelectColumns(
+		        LimitedCatalog,
+		        {
+		            "match_id",
+		            "match_date",
+		            "competition_stage",
+		            "home_team",
+		            "away_team",
+		            "home_score",
+		            "away_score"
+		        }
+		    ),
+		    ExpandedStage = Table.ExpandRecordColumn(
+		        SelectedColumns,
+		        "competition_stage",
+		        {"name", "Stage"}
+		    ),
+		    ExpandedHomeTeam = Table.ExpandRecordColumn(
+		        ExpandedStage,
+		        "home_team", 
+		        {"home_team_id", "home_team_name"},
+		        {"HomeTeamID", "HomeTeamName"}
+		    )
 		in
-		    Catalog
+		    ExpandedHomeTeam
 		```
 	lineageTag: 201913b2-8a05-473b-a416-bd98ff8a5fe0
 
 	annotation PBI_NavigationStepName = Navigation
 
-	annotation PBI_ResultType = Exception
+	annotation PBI_ResultType = Table
 
