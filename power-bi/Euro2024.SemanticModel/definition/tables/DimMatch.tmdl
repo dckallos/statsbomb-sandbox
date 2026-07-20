@@ -1,0 +1,96 @@
+table DimMatch
+	lineageTag: 02b84327-6756-4664-be56-889abddf9089
+
+	column MatchID
+		dataType: int64
+		formatString: 0
+		lineageTag: 780f762d-6c3a-4644-b609-4f9f239e509e
+		summarizeBy: count
+		sourceColumn: MatchID
+
+		annotation SummarizationSetBy = Automatic
+
+	column MatchDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: fb28c9a3-685b-4687-b193-a28f65d1f4eb
+		summarizeBy: none
+		sourceColumn: MatchDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Stage
+		dataType: string
+		lineageTag: 8f69c976-a7a4-4f83-998e-9845b52b3b88
+		summarizeBy: none
+		sourceColumn: Stage
+
+		annotation SummarizationSetBy = Automatic
+
+	column MatchLabel
+		dataType: string
+		lineageTag: fb38b9a0-5244-4808-900b-a67bd006919a
+		summarizeBy: none
+		sourceColumn: MatchLabel
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimMatch = m
+		mode: import
+		source = ```
+				let
+					MatchColumns = Table.SelectColumns(
+						StgMatches,
+						{"MatchID", "MatchDate", "Stage", "HomeTeamName", "AwayTeamName"}
+					),
+					// I want it to look like this: Group Stage · 18 Jun · Portugal vs Czech Republic
+					AddedMatchLabel = Table.AddColumn(
+						MatchColumns,
+						"MatchLabel",
+						each
+							[Stage] & " · "
+							& Date.ToText(
+								[MatchDate],
+								[
+									Format = ProjectConfig[MatchDateFormat],
+									Culture = ProjectConfig[MatchDateCulture]
+								]
+							)
+							& " · " & [HomeTeamName] & " vs " & [AwayTeamName],
+							type text
+				
+					),
+					Matches = Table.SelectColumns(
+				        AddedMatchLabel, {"MatchID", "MatchDate", "Stage", "MatchLabel"}),
+				    TypedMatches = Table.TransformColumnTypes(
+				    	Matches, {
+				        	{"MatchID", Int64.Type}, 
+				        	{"MatchDate", type date},
+				        	{"Stage", type text}, 
+				        	{"MatchLabel", type text}
+				    }),
+					InvalidRows = Table.SelectRows(
+						TypedMatches, 
+						each
+							[MatchID] = null or [MatchDate] = null
+							or [Stage] = null or [Stage] = ""
+							or [MatchLabel] = null or [MatchLabel] = ""
+						),
+				    HasDuplicateMatchIDs =
+				        Table.RowCount(TypedMatches) <> List.Count(List.Distinct(TypedMatches[MatchID])),
+				    Output =
+				        if not Table.IsEmpty(InvalidRows) then error "DimMatch has a blank requird value."
+				        else if HasDuplicateMatchIDs then error "DimMatch has duplicate MatchID values."
+				        else TypedMatches
+				in 
+					Output
+					// T ypedMatches
+					// AddedMatchLabel
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
