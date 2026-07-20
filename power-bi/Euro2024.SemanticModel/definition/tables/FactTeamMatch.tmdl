@@ -128,9 +128,92 @@ table FactTeamMatch
 				            {"GoalsAgainst", Int64.Type}, 
 				            {"ScoreLabel", type text}
 				        }
-				    )
+				    ),
+				    InvalidRows = Table.SelectRows(
+				        TypedFact, 
+				        each
+				            [MatchID] = null 
+				                or [TeamID] = null 
+				                or [OpponentTeamID] = null
+				                or [OpponentTeamName] = null 
+				                or [OpponentTeamName] = "" 
+				                or [IsHome] = null
+				                or [GoalsFor] = null 
+				                or [GoalsAgainst] = null 
+				                or [ScoreLabel] = null
+				                or [TeamID] = [OpponentTeamID]
+				    
+				    ),
+				    DistinctKeys = Table.Distinct(
+				        Table.SelectColumns(TypedFact, {"MatchID", "TeamID"})
+				    ),
+				    MatchChecks = Table.Group(
+				        TypedFact, 
+				        {"MatchID"}, 
+				        {
+				            {"RowCount", each Table.RowCount(_), Int64.Type},
+				            {"TeamCount", each List.Count(List.Distinct([TeamID])), Int64.Type},
+				            {"HomeCount", each List.Count(List.Select([IsHome], each _ = true)), Int64.Type}
+				        }
+				    ),
+				    JoinedSource = Table.NestedJoin(
+				        TypedFact, {"MatchID"}, StgMatches, {"MatchID"}, "Source", JoinKind.LeftOuter),
+				    ExpandedSource = Table.ExpandTableColumn(
+				        JoinedSource,
+				        "Source",
+				        {"HomeTeamID", "HomeTeamName", "AwayTeamID", "AwayTeamName", "HomeScore", "AwayScore"},
+				        {"HomeTeamID", "HomeTeamName", "AwayTeamID", "AwayTeamName", "HomeScore", "AwayScore"}
+				    ),
+				    InvalidAssignments = Table.SelectRows(
+				        ExpandedSource, 
+				        each
+				            [HomeTeamID] = null 
+				                or [AwayTeamID] = null
+				        or (
+				            [IsHome] = true 
+				                and (
+				                    [TeamID] <> [HomeTeamID] 
+				                    or [OpponentTeamID] <> [AwayTeamID]
+				                    or [OpponentTeamName] <> [AwayTeamName]
+				                    or [GoalsFor] <> [HomeScore] 
+				                    or [GoalsAgainst] <> [AwayScore]
+				                    or [ScoreLabel] <> (
+				                        Text.From([HomeScore]) & "–" & Text.From([AwayScore])
+				                    )
+				            )
+				        )
+				        or (
+				            [IsHome] = false 
+				                and (
+				                    [TeamID] <> [AwayTeamID] 
+				                    or [OpponentTeamID] <> [HomeTeamID]
+				                    or [OpponentTeamName] <> [HomeTeamName]
+				                    or [GoalsFor] <> [AwayScore] 
+				                    or [GoalsAgainst] <> [HomeScore]
+				                    or [ScoreLabel] <> (
+				                        Text.From([AwayScore]) & "–" & Text.From([HomeScore])
+				                    )
+				            )
+				        )
+				    
+				    ),
+				    HasWrongRowCount =
+				        Table.RowCount(TypedFact) <> ProjectConfig[TeamsPerMatch] * Table.RowCount(StgMatches),
+				    HasDuplicateKeys = Table.RowCount(TypedFact) <> Table.RowCount(DistinctKeys),
+				    HasInvalidMatchCounts = not Table.IsEmpty(Table.SelectRows(MatchChecks, each
+				        [RowCount] <> ProjectConfig[TeamsPerMatch]
+				        or [TeamCount] <> ProjectConfig[TeamsPerMatch]
+				        or [HomeCount] <> 1
+				    )),
+				    Output =
+				        if not Table.IsEmpty(InvalidRows) then error "FactTeamMatch has a blank or invalid required value."
+				        else if HasWrongRowCount or HasDuplicateKeys or HasInvalidMatchCounts then
+				            error "FactTeamMatch must have two unique team rows and one home row per match."
+				        else if not Table.IsEmpty(InvalidAssignments) then
+				            error "FactTeamMatch roles, opponents, scores, or labels do not mirror StgMatches."
+				        else TypedFact
 				in
-				    TypedFact
+				    Output
 				```
 
 	annotation PBI_NavigationStepName = Navigation
