@@ -182,32 +182,80 @@ expression StgMatches = ```
 
 	annotation PBI_ResultType = Table
 
-expression StgShots =
+expression StgShots = ```
 		let
-			MatchIDs = Table.SelectColumns(
-				StgMatches,
-				{"MatchID"}
+			// NOTE: This is an **awful workaround** to firewall restrictions that prevent consumption of StgMatches
+			// OBVIOUS RISK: Branching of logic in Matches between StgMatches and StgShots
+			// TODO: At a minimum, wrap both staging scripts into functions that lead to the same result, preventing branching
+			// FOR NOW: Out of time, need to capture enhancement and continue with duct-tape solution below.
+			MatchLimit = ProjectConfig[MatchLimit],
+			CheckedMatchLimit = 
+				if MatchLimit = null then
+					null
+				else if not Value.Is(MatchLimit, type number) then
+					error "ProjectConfig MatchLimit be null (release) or a positive whole number (dev)"
+				else if MatchLimit >= ProjectConfig[MinimumMatchLimit]
+				then
+					MatchLimit
+				else
+					error "ProjectConfig MatchLimit be null (release) or a positive whole number (dev)",
+			MatchCatalogPath = Text.Combine(
+				{
+					ProjectConfig[SourceRepository],
+					ProjectConfig[SourceRef],
+					ProjectConfig[MatchCatalogPath],
+					Text.From(ProjectConfig[CompetitionID]),
+					Text.From(ProjectConfig[SeasonID]) & ".json"
+		
+				},
+				"/"
+			),
+			MatchCatalogSource = fxGetJson(MatchCatalogPath),
+			CheckedMatchCatalog = 
+				if not Value.Is(MatchCatalogSource, type list) then
+					error "The Match catalog response is not a JSON list."
+				else if List.IsEmpty(MatchCatalogSource) then
+					error "The match catalog is empty."
+				else MatchCatalogSource,
+			MatchCatalog = Table.FromRecords(CheckedMatchCatalog),
+			LimitedMatchCatalog = 
+				if CheckedMatchLimit = null then
+					MatchCatalog
+				else
+					Table.FirstN(MatchCatalog, CheckedMatchLimit),
+			MatchIDs = Table.TransformColumnTypes(
+				Table.RenameColumns(
+					Table.SelectColumns(
+						LimitedMatchCatalog,
+						{"match_id"}
+					),
+					{
+						{"match_id", "MatchID"}
+					}
+				),
+				{
+					{"MatchID", Int64.Type}
+				}
 			),
 			AddedEvents = Table.AddColumn(
 				MatchIDs,
 				"Events",
-				each fxGetJson(
-					Text.Combine(
-						{
-							ProjectConfig[SourceRepository],
-							ProjectConfig[SourceRef],
-							ProjectConfig[EventPath],
-							Text.From([MatchID]) & ".json"
-						}, "/"
-					)
-				),
+				each fxGetJson(Text.Combine(
+					{
+						ProjectConfig[SourceRepository],
+						ProjectConfig[SourceRef],
+						ProjectConfig[EventPath],
+						Text.From([MatchID]) & ".json"
+					},
+				"/")),
 				type list
 			)
 		in
 			AddedEvents
+		```
 	lineageTag: d7638c7b-4fc7-4a54-a6bc-f716e4732051
 
 	annotation PBI_NavigationStepName = Navigation
 
-	annotation PBI_ResultType = Exception
+	annotation PBI_ResultType = Table
 
