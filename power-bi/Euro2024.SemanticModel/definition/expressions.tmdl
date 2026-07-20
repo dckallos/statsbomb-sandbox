@@ -291,7 +291,7 @@ expression StgShots = ```
 			ExpandedShot = Table.ExpandRecordColumn(
 				ExpandedTeam,
 				"Shot",
-				{"statsbom_xg", "outcome"},
+				{"statsbomb_xg", "outcome"},
 				{"ExpectedGoals", "ShotOutcome"}
 			),
 			ExpandedOutcome = Table.ExpandRecordColumn(
