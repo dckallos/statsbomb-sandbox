@@ -13,7 +13,7 @@ expression ProjectConfig =
 		    ShotEventName = "Shot",
 		    ShootoutPeriod = 5,
 		    MinimumExpectedGoals = 0,
-		    MaximumExectedGoals = 1,
+		    MaximumExpectedGoals = 1,
 		    MatchDateFormat = "dd MMM",
 		    MatchDateCulture = "en-US"
 		
