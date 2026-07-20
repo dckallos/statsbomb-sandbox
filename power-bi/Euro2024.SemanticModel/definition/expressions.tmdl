@@ -88,9 +88,52 @@ expression StgMatches = ```
 		        "home_team", 
 		        {"home_team_id", "home_team_name"},
 		        {"HomeTeamID", "HomeTeamName"}
+		    ),
+		    ExpandedAwayTeam = Table.ExpandRecordColumn(
+		        ExpandedHomeTeam,
+		        "away_team",
+		        {
+		            "away_team_id", "away_team_name"
+		        },
+		        {
+		            "AwayTeamID", "AwayTeamName"
+		        }
+		    ),
+		    RenamedColumns = Table.RenameColumns(
+		        ExpandedAwayTeam,
+		        {
+		            {"match_id", "MatchID"},
+		            {"match_date", "MatchDate"},
+		            {"home_score", "HomeScore"},
+		            {"away_score", "AwayScore"}
+		        }
+		    ),
+		    // TODO: Organize funtions and move to top of script
+		    IsInvalidScore = (Score as nullable number) as logical =>
+		        if Score = null then
+		            true
+		        else
+		            Score < ProjectConfig[MinimumScore]
+		            or Number.Mod(Score, 1) <> 0,
+		    InvalidRows = Table.SelectRows(
+		        RenamedColumns,
+		        each
+		            [MatchID] = null
+		                or [MatchDate] = null
+		                or [Stage] = null
+		                or [Stage] = ""
+		                or [HomeTeamName] = null
+		                or [AwayTeamName] = null
+		                or [HomeTeamID] = null
+		                or [AwayTeamID] = null
+		                or [HomeTeamName] = ""
+		                or [AwayTeamName] = ""
+		                or [HomeTeamID] = [AwayTeamID]
+		                or IsInvalidScore([HomeScore])
+		                or IsInvalidScore([AwayScore])
 		    )
 		in
-		    ExpandedHomeTeam
+		    InvalidRows
 		```
 	lineageTag: 201913b2-8a05-473b-a416-bd98ff8a5fe0
 
