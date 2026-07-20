@@ -6,7 +6,7 @@ expression ProjectConfig =
 		    EventPath = "data/events",
 		    CompetitionID = 55,
 		    SeasonID =282,
-		    MatchLimit = 1,
+		    MatchLimit = null,
 		    MinimumMatchLimit= 1,
 		    TeamsPerMatch = 2,
 		    MinimumScore= 0,
@@ -181,4 +181,33 @@ expression StgMatches = ```
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
+
+expression StgShots =
+		let
+			MatchIDs = Table.SelectColumns(
+				StgMatches,
+				{"MatchID"}
+			),
+			AddedEvents = Table.AddColumn(
+				MatchIDs,
+				"Events",
+				each fxGetJson(
+					Text.Combine(
+						{
+							ProjectConfig[SourceRepository],
+							ProjectConfig[SourceRef],
+							ProjectConfig[EventPath],
+							Text.From([MatchID]) & ".json"
+						}, "/"
+					)
+				),
+				type list
+			)
+		in
+			AddedEvents
+	lineageTag: d7638c7b-4fc7-4a54-a6bc-f716e4732051
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
 
