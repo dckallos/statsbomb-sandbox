@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "bc35a8891cbb964c0ed4",
   "position": {
-    "x": 640,
-    "y": 0,
+    "x": 640.625,
+    "y": 95.3125,
     "z": 2000,
-    "height": 720,
-    "width": 640,
+    "height": 625,
+    "width": 639.0625,
     "tabOrder": 2000
   },
   "visual": {
@@ -66,7 +66,8 @@
                 }
               },
               "queryRef": "FactTeamMatch.Goals Scored",
-              "nativeQueryRef": "Goals Scored"
+              "nativeQueryRef": "Total actual goals",
+              "displayName": "Total actual goals"
             },
             {
               "field": {
@@ -80,7 +81,8 @@
                 }
               },
               "queryRef": "FactTeamMatch.Expected Goals",
-              "nativeQueryRef": "Expected Goals"
+              "nativeQueryRef": "Total expected goals",
+              "displayName": "Total expected goals"
             },
             {
               "field": {
@@ -152,12 +154,12 @@
                       "Entity": "FactTeamMatch"
                     }
                   },
-                  "Property": "Goals per Match"
+                  "Property": "Expected Goals per Match"
                 }
               },
-              "queryRef": "FactTeamMatch.Goals per Match",
-              "nativeQueryRef": "Actual goals",
-              "displayName": "Actual goals"
+              "queryRef": "FactTeamMatch.Expected Goals per Match",
+              "nativeQueryRef": "Expected goals",
+              "displayName": "Expected goals"
             },
             {
               "field": {
@@ -167,12 +169,12 @@
                       "Entity": "FactTeamMatch"
                     }
                   },
-                  "Property": "Expected Goals per Match"
+                  "Property": "Goals per Match"
                 }
               },
-              "queryRef": "FactTeamMatch.Expected Goals per Match",
-              "nativeQueryRef": "Expected goals",
-              "displayName": "Expected goals"
+              "queryRef": "FactTeamMatch.Goals per Match",
+              "nativeQueryRef": "Actual goals",
+              "displayName": "Actual goals"
             }
           ]
         }
@@ -334,6 +336,19 @@
             }
           }
         }
+      ],
+      "categoryAxis": [
+        {
+          "properties": {
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -357,6 +372,38 @@
               "expr": {
                 "Literal": {
                   "Value": "'Scored fewer than expected'"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI Semibold'', wf_segoe-ui_semibold, helvetica, arial, sans-serif'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "18D"
+                }
+              }
+            },
+            "heading": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Heading2'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#C77B4D'"
+                    }
+                  }
                 }
               }
             }
@@ -442,6 +489,109 @@
             }
           ]
         }
+      },
+      {
+        "name": "f471bc17dac7187ab306",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimTeam"
+              }
+            },
+            "Property": "TeamName"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "3af2f2b753247aa0ad3c",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Goals per Match"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f55a22b4aeae3de15636",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DimTeam"
+                  }
+                },
+                "Property": "TeamName"
+              }
+            },
+            "Function": 3
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "a01ff0f562c60a1087d9",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Goals Scored"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "195a27d3635674e25d50",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Expected Goals"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "aae1b2bf07c45a5e1b00",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Matches Played"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "ea734e06d8565d72c366",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Expected Goals per Match"
+          }
+        },
+        "type": "Advanced"
       }
     ]
   }
