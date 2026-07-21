@@ -16,6 +16,8 @@ The original goal was to begin with a tournament-wide team comparison, then narr
 
 **The report stopped at one page for a practical reason.** Late VM input problems made further report editing unreliable, so I focused on preserving the working model, its analytical rules, and a clear next path.
 
+Acknowledge: [Issue #13: bug: Report Fetches from FactShot but with no Relationship to FactTeamMatch](https://github.com/dckallos/statsbomb-sandbox/issues/13)
+
 ## Contents
 
 - [Current report page and result](#current-report-page-and-result)
