@@ -1,0 +1,150 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "0570b27a831e060e1126",
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "height": 720,
+    "width": 1280,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimTeam"
+                    }
+                  },
+                  "Property": "TeamName"
+                }
+              },
+              "queryRef": "DimTeam.TeamName",
+              "nativeQueryRef": "TeamName",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTeamMatch"
+                    }
+                  },
+                  "Property": "Goals per Match"
+                }
+              },
+              "queryRef": "FactTeamMatch.Goals per Match",
+              "nativeQueryRef": "Goals per Match"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTeamMatch"
+                    }
+                  },
+                  "Property": "Expected Goals per Match"
+                }
+              },
+              "queryRef": "FactTeamMatch.Expected Goals per Match",
+              "nativeQueryRef": "Expected Goals per Match"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "FactTeamMatch"
+                  }
+                },
+                "Property": "Goals per Match"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "61a2ae8a990b19b19ed1",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimTeam"
+              }
+            },
+            "Property": "TeamName"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "d33b709dc82db37d6638",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Goals per Match"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "b4d14a752400400a001e",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Expected Goals per Match"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

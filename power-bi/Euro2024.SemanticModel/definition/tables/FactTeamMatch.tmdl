@@ -1,6 +1,80 @@
 table FactTeamMatch
 	lineageTag: fa4ef1eb-ead3-45cd-83f6-cee4def13dad
 
+	measure 'Matches Played' =
+			
+			DISTINCTCOUNT (
+			    FactTeamMatch[MatchID]
+			)
+		formatString: 0
+		lineageTag: 7bc9c550-1d26-429e-919d-5241bfcbbe61
+
+	measure 'Goals Scored' =
+			
+			SUM (
+			    FactTeamMatch[GoalsFor]
+			)
+		formatString: 0
+		lineageTag: 55b4fe86-7217-4c94-bb83-521e20431c39
+
+	measure 'Goals Against' =
+			
+			SUM (
+			    FactTeamMatch[GoalsAgainst]
+			)
+		formatString: 0
+		lineageTag: 08e2a8a2-6090-4440-ac46-212346bd07fe
+
+	measure 'Goals per Match' =
+			
+			DIVIDE (
+			    [Goals Scored],
+			    [Matches Played]
+			)
+		formatString: 0.00
+		lineageTag: 0d8343ac-943c-4dce-a1c2-cc43b2f92ca4
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Expected Goals per Match' =
+			
+			DIVIDE (
+			    [Expected Goals],
+			    [Matches Played]
+			)
+		formatString: 0.00
+		lineageTag: 4fef8209-fb7f-44e5-af56-2188e5771a6c
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Goals Minus Expected per Match' =
+			
+			IF (
+			    ISBLANK ( [Matches Played] ),
+			    BLANK (),
+			    [Goals per Match] - [Expected Goals per Match]
+			)
+		formatString: +0.00;-0.00;0.00
+		lineageTag: d61e105d-46e3-415b-a887-759458e209af
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Expected Goals' =
+			
+			IF (
+			    [Matches Played] > 0,
+			    COALESCE (
+			        SUM (
+			            FactShot[ExpectedGoals]
+			        ),
+			        0
+			    )
+			)
+		formatString: 0.00
+		lineageTag: 351cac2f-4e80-409d-82ff-322b8a67cd33
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
 	column MatchID
 		dataType: int64
 		formatString: 0
