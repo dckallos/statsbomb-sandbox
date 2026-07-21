@@ -36,6 +36,26 @@
           "projections": [
             {
               "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "DimTeam"
+                        }
+                      },
+                      "Property": "TeamName"
+                    }
+                  },
+                  "Function": 3
+                }
+              },
+              "queryRef": "Min(DimTeam.TeamName)",
+              "nativeQueryRef": "TeamName1",
+              "displayName": "TeamName"
+            },
+            {
+              "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
@@ -70,12 +90,27 @@
                       "Entity": "FactTeamMatch"
                     }
                   },
+                  "Property": "Goals per Match"
+                }
+              },
+              "queryRef": "FactTeamMatch.Goals per Match",
+              "nativeQueryRef": "Actual goals",
+              "displayName": "Actual goals"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTeamMatch"
+                    }
+                  },
                   "Property": "Expected Goals per Match"
                 }
               },
               "queryRef": "FactTeamMatch.Expected Goals per Match",
-              "nativeQueryRef": "Expected Goals per Match",
-              "displayName": "Expected Goals per Match"
+              "nativeQueryRef": "Expected goals",
+              "displayName": "Expected goals"
             },
             {
               "field": {
@@ -121,8 +156,8 @@
                 }
               },
               "queryRef": "FactTeamMatch.Goals per Match",
-              "nativeQueryRef": "Actual Goals per Match",
-              "displayName": "Actual Goals per Match"
+              "nativeQueryRef": "Actual goals",
+              "displayName": "Actual goals"
             },
             {
               "field": {
@@ -136,8 +171,8 @@
                 }
               },
               "queryRef": "FactTeamMatch.Expected Goals per Match",
-              "nativeQueryRef": "Expected Goals per Match",
-              "displayName": "Expected Goals per Match"
+              "nativeQueryRef": "Expected goals",
+              "displayName": "Expected goals"
             }
           ]
         }
@@ -175,6 +210,20 @@
               "expr": {
                 "Literal": {
                   "Value": "2.5D"
+                }
+              }
+            },
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "gridlineStyle": {
+              "expr": {
+                "Literal": {
+                  "Value": "'solid'"
                 }
               }
             }
@@ -294,7 +343,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             }
@@ -308,6 +357,33 @@
               "expr": {
                 "Literal": {
                   "Value": "'Scored fewer than expected'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Default'"
+                }
+              }
+            },
+            "showTooltipFieldsOnly": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "showChartSpecificTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }

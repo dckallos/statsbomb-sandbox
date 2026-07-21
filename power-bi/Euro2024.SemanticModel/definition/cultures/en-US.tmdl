@@ -2565,7 +2565,7 @@ cultureInfo en-US
 			          }
 			        },
 			        {
-			          "Actual Goals per Match": {
+			          "Actual goals": {
 			            "State": "Suggested",
 			            "Source": {
 			              "Type": "External",
@@ -2694,6 +2694,16 @@ cultureInfo en-US
 			              "Agent": "Thesaurus"
 			            },
 			            "Weight": 0.474
+			          }
+			        },
+			        {
+			          "Expected goals": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
 			          }
 			        }
 			      ]

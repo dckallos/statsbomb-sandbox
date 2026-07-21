@@ -36,6 +36,26 @@
           "projections": [
             {
               "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "DimTeam"
+                        }
+                      },
+                      "Property": "TeamName"
+                    }
+                  },
+                  "Function": 3
+                }
+              },
+              "queryRef": "Min(DimTeam.TeamName)",
+              "nativeQueryRef": "TeamName1",
+              "displayName": "TeamName"
+            },
+            {
+              "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
@@ -70,12 +90,27 @@
                       "Entity": "FactTeamMatch"
                     }
                   },
+                  "Property": "Goals per Match"
+                }
+              },
+              "queryRef": "FactTeamMatch.Goals per Match",
+              "nativeQueryRef": "Actual goals",
+              "displayName": "Actual goals"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTeamMatch"
+                    }
+                  },
                   "Property": "Expected Goals per Match"
                 }
               },
               "queryRef": "FactTeamMatch.Expected Goals per Match",
-              "nativeQueryRef": "Expected Goals per Match",
-              "displayName": "Expected Goals per Match"
+              "nativeQueryRef": "Expected goals",
+              "displayName": "Expected goals"
             },
             {
               "field": {
@@ -121,8 +156,8 @@
                 }
               },
               "queryRef": "FactTeamMatch.Goals per Match",
-              "nativeQueryRef": "Actual Goals per Match",
-              "displayName": "Actual Goals per Match"
+              "nativeQueryRef": "Actual goals",
+              "displayName": "Actual goals"
             },
             {
               "field": {
@@ -136,8 +171,8 @@
                 }
               },
               "queryRef": "FactTeamMatch.Expected Goals per Match",
-              "nativeQueryRef": "Expected Goals per Match",
-              "displayName": "Expected Goals per Match"
+              "nativeQueryRef": "Expected goals",
+              "displayName": "Expected goals"
             }
           ]
         }
@@ -217,7 +252,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#D6DADE'"
+                      "Value": "'#F3F2F1'"
                     }
                   }
                 }
@@ -381,7 +416,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             }
@@ -395,6 +430,26 @@
               "expr": {
                 "Literal": {
                   "Value": "'Scored more than expected'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Default'"
+                }
+              }
+            },
+            "showTooltipFieldsOnly": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }
@@ -455,7 +510,7 @@
         }
       },
       {
-        "name": "0febdce4e2c68b690914",
+        "name": "841edb363aee551a30a3",
         "field": {
           "Column": {
             "Expression": {
@@ -469,7 +524,7 @@
         "type": "Categorical"
       },
       {
-        "name": "96058a4b11398ce1a630",
+        "name": "ea02a806975008167958",
         "field": {
           "Measure": {
             "Expression": {
@@ -483,7 +538,7 @@
         "type": "Advanced"
       },
       {
-        "name": "f7273a4a268e608c2bc5",
+        "name": "6e763c13243034757401",
         "field": {
           "Measure": {
             "Expression": {
@@ -497,7 +552,26 @@
         "type": "Advanced"
       },
       {
-        "name": "fb7a156c438ce312a59a",
+        "name": "da4bcfcc075d7060d4a9",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DimTeam"
+                  }
+                },
+                "Property": "TeamName"
+              }
+            },
+            "Function": 3
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "a577622fbc00d45bb794",
         "field": {
           "Measure": {
             "Expression": {
@@ -511,7 +585,7 @@
         "type": "Advanced"
       },
       {
-        "name": "0bf640e66c9c4b5d9240",
+        "name": "e471f87365c5bd204ec5",
         "field": {
           "Measure": {
             "Expression": {
@@ -525,7 +599,7 @@
         "type": "Advanced"
       },
       {
-        "name": "ae31c34d00dcba50eacc",
+        "name": "92afbf80ba1d80616072",
         "field": {
           "Measure": {
             "Expression": {
