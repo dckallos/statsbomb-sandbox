@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "0570b27a831e060e1126",
+  "name": "bc35a8891cbb964c0ed4",
   "position": {
-    "x": 0,
+    "x": 640,
     "y": 0,
-    "z": 0,
+    "z": 2,
     "height": 720,
     "width": 640,
-    "tabOrder": 0
+    "tabOrder": 2
   },
   "visual": {
     "visualType": "clusteredBarChart",
@@ -175,152 +175,6 @@
         ]
       }
     },
-    "objects": {
-      "categoryAxis": [
-        {
-          "properties": {
-            "titleText": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Scored more than expected'"
-                }
-              }
-            },
-            "showAxisTitle": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "valueAxis": [
-        {
-          "properties": {
-            "gridlineShow": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "start": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
-                }
-              }
-            },
-            "end": {
-              "expr": {
-                "Literal": {
-                  "Value": "2.5D"
-                }
-              }
-            },
-            "showAxisTitle": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            },
-            "gridlineColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#D6DADE'"
-                    }
-                  }
-                }
-              }
-            },
-            "gridlineThickness": {
-              "expr": {
-                "Literal": {
-                  "Value": "1D"
-                }
-              }
-            },
-            "gridlineStyle": {
-              "expr": {
-                "Literal": {
-                  "Value": "'solid'"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "dataPoint": [
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#2F6F9F'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "FactTeamMatch.Goals per Match"
-          }
-        },
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#D6DADE'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "FactTeamMatch.Expected Goals per Match"
-          }
-        }
-      ],
-      "labels": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "labelDisplayUnits": {
-              "expr": {
-                "Literal": {
-                  "Value": "1D"
-                }
-              }
-            },
-            "labelPrecision": {
-              "expr": {
-                "Literal": {
-                  "Value": "2L"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "subTitle": [
         {
@@ -341,7 +195,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Scored more than expected'"
+                  "Value": "'Scored fewer than expected'"
                 }
               }
             }
@@ -354,7 +208,7 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "61a2ae8a990b19b19ed1",
+        "name": "44fe08ff41276db5cee3",
         "field": {
           "Column": {
             "Expression": {
@@ -368,7 +222,7 @@
         "type": "Categorical"
       },
       {
-        "name": "d33b709dc82db37d6638",
+        "name": "e20f7767921a2aebc8b2",
         "field": {
           "Measure": {
             "Expression": {
@@ -382,7 +236,7 @@
         "type": "Advanced"
       },
       {
-        "name": "b4d14a752400400a001e",
+        "name": "321edba0c8bdc3e00c05",
         "field": {
           "Measure": {
             "Expression": {
@@ -396,7 +250,7 @@
         "type": "Advanced"
       },
       {
-        "name": "077c01f20abac1c4ad86",
+        "name": "6fc20d708475b5dd505b",
         "field": {
           "Measure": {
             "Expression": {
@@ -410,7 +264,7 @@
         "type": "Advanced"
       },
       {
-        "name": "38604e30d8062d1c03ac",
+        "name": "ba8f92ed02b269851679",
         "field": {
           "Measure": {
             "Expression": {
@@ -424,7 +278,7 @@
         "type": "Advanced"
       },
       {
-        "name": "9e21d15618a9ac5e82cc",
+        "name": "5a02b83a0b5a284c9b23",
         "field": {
           "Measure": {
             "Expression": {
@@ -449,7 +303,7 @@
             {
               "Condition": {
                 "Comparison": {
-                  "ComparisonKind": 2,
+                  "ComparisonKind": 3,
                   "Left": {
                     "Measure": {
                       "Expression": {
@@ -472,7 +326,7 @@
         }
       },
       {
-        "name": "473610ea9a0c97e5a513",
+        "name": "3ab437446be099ecc68b",
         "field": {
           "Measure": {
             "Expression": {
