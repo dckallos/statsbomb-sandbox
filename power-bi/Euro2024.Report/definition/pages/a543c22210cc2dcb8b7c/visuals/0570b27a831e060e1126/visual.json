@@ -70,27 +70,12 @@
                       "Entity": "FactTeamMatch"
                     }
                   },
-                  "Property": "Goals per Match"
-                }
-              },
-              "queryRef": "FactTeamMatch.Goals per Match",
-              "nativeQueryRef": "Actual goals",
-              "displayName": "Actual goals"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "FactTeamMatch"
-                    }
-                  },
                   "Property": "Expected Goals per Match"
                 }
               },
               "queryRef": "FactTeamMatch.Expected Goals per Match",
-              "nativeQueryRef": "Expected goals",
-              "displayName": "Expected goals"
+              "nativeQueryRef": "Expected Goals per Match",
+              "displayName": "Expected Goals per Match"
             },
             {
               "field": {
@@ -136,8 +121,8 @@
                 }
               },
               "queryRef": "FactTeamMatch.Goals per Match",
-              "nativeQueryRef": "Actual goals",
-              "displayName": "Actual goals"
+              "nativeQueryRef": "Actual Goals per Match",
+              "displayName": "Actual Goals per Match"
             },
             {
               "field": {
@@ -151,8 +136,8 @@
                 }
               },
               "queryRef": "FactTeamMatch.Expected Goals per Match",
-              "nativeQueryRef": "Expected goals",
-              "displayName": "Expected goals"
+              "nativeQueryRef": "Expected Goals per Match",
+              "displayName": "Expected Goals per Match"
             }
           ]
         }
@@ -268,6 +253,31 @@
                   }
                 }
               }
+            },
+            "borderShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "borderColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#215575'"
+                    }
+                  }
+                }
+              }
+            },
+            "borderSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
             }
           },
           "selector": {
@@ -282,6 +292,31 @@
                   "expr": {
                     "Literal": {
                       "Value": "'#D6DADE'"
+                    }
+                  }
+                }
+              }
+            },
+            "borderShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "borderSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "borderColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#9AA2A8'"
                     }
                   }
                 }
@@ -314,6 +349,24 @@
               "expr": {
                 "Literal": {
                   "Value": "2L"
+                }
+              }
+            },
+            "labelPosition": {
+              "expr": {
+                "Literal": {
+                  "Value": "'OutsideEnd'"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#24272A'"
+                    }
+                  }
                 }
               }
             }
@@ -353,76 +406,6 @@
   },
   "filterConfig": {
     "filters": [
-      {
-        "name": "61a2ae8a990b19b19ed1",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "DimTeam"
-              }
-            },
-            "Property": "TeamName"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "d33b709dc82db37d6638",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "FactTeamMatch"
-              }
-            },
-            "Property": "Goals per Match"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "b4d14a752400400a001e",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "FactTeamMatch"
-              }
-            },
-            "Property": "Expected Goals per Match"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "077c01f20abac1c4ad86",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "FactTeamMatch"
-              }
-            },
-            "Property": "Goals Scored"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "38604e30d8062d1c03ac",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "FactTeamMatch"
-              }
-            },
-            "Property": "Expected Goals"
-          }
-        },
-        "type": "Advanced"
-      },
       {
         "name": "9e21d15618a9ac5e82cc",
         "field": {
@@ -472,7 +455,77 @@
         }
       },
       {
-        "name": "473610ea9a0c97e5a513",
+        "name": "0febdce4e2c68b690914",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimTeam"
+              }
+            },
+            "Property": "TeamName"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "96058a4b11398ce1a630",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Goals per Match"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f7273a4a268e608c2bc5",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Expected Goals per Match"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "fb7a156c438ce312a59a",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Goals Scored"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "0bf640e66c9c4b5d9240",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTeamMatch"
+              }
+            },
+            "Property": "Expected Goals"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "ae31c34d00dcba50eacc",
         "field": {
           "Measure": {
             "Expression": {
