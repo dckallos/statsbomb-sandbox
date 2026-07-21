@@ -1,0 +1,330 @@
+expression ProjectConfig =
+		[
+		    SourceRepository = "statsbomb/open-data",
+		    SourceRef = "b0bc9f22dd77c206ddedc1d742893b3bbe64baec",
+		    MatchCatalogPath = "data/matches",
+		    EventPath = "data/events",
+		    CompetitionID = 55,
+		    SeasonID =282,
+		    MatchLimit = null,
+		    MinimumMatchLimit= 1,
+		    TeamsPerMatch = 2,
+		    MinimumScore= 0,
+		    ShotEventName = "Shot",
+		    ShootoutPeriod = 5,
+		    MinimumExpectedGoals = 0,
+		    MaximumExpectedGoals = 1,
+		    MatchDateFormat = "dd MMM",
+		    MatchDateCulture = "en-US"
+		
+		]
+	lineageTag: 213db9ee-dd62-4869-bf2b-6be9a9cb88f0
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Record
+
+expression fxGetJson =
+		(relativePath as text) as any =>
+		    Json.Document(
+		        Web.Contents(
+		            "https://raw.githubusercontent.com",
+		            [RelativePath = relativePath]
+		        )
+		    )
+	lineageTag: 4e2ceaf3-8e04-40a9-b257-31c1b9c4fd78
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression StgMatches = ```
+		let
+		    MatchLimit = ProjectConfig[MatchLimit],
+		    CheckedMatchLimit = 
+		        if MatchLimit = null then null
+		        else if not Value.Is(MatchLimit, type number) then
+		            error "ProjectConfig MatchLimt must be null or a positive wle number."
+		        else if MatchLimit >= ProjectConfig[MinimumMatchLimit]
+		        then MatchLimit
+		        else error "ProjectConfig MatchLimit must be null or a positive whole number.",
+		    SourcePath = Text.Combine(
+		        {
+		            ProjectConfig[SourceRepository],
+		            ProjectConfig[SourceRef],
+		            ProjectConfig[MatchCatalogPath],
+		            Text.From(ProjectConfig[CompetitionID]),
+		            Text.From(ProjectConfig[SeasonID]) & ".json"
+		        }, "/"
+		    ),
+		    Source = fxGetJson(SourcePath),
+		    CheckedSource =
+		        if not Value.Is(Source, type list) then error "The match catalog response is not a JSON list."
+		        else if List.IsEmpty(Source) then error "The match catalog is empty."
+		        else Source,
+		    Catalog = Table.FromRecords(CheckedSource),
+		    LimitedCatalog =
+		        if CheckedMatchLimit = null then Catalog
+		        else Table.FirstN(Catalog, CheckedMatchLimit),
+		    SelectedColumns = Table.SelectColumns(
+		        LimitedCatalog,
+		        {
+		            "match_id",
+		            "match_date",
+		            "competition_stage",
+		            "home_team",
+		            "away_team",
+		            "home_score",
+		            "away_score"
+		        }
+		    ),
+		    ExpandedStage = Table.ExpandRecordColumn(
+		        SelectedColumns,
+		        "competition_stage",
+		        {"name"}, {"Stage"}
+		    ),
+		    ExpandedHomeTeam = Table.ExpandRecordColumn(
+		        ExpandedStage,
+		        "home_team", 
+		        {"home_team_id", "home_team_name"},
+		        {"HomeTeamID", "HomeTeamName"}
+		    ),
+		    ExpandedAwayTeam = Table.ExpandRecordColumn(
+		        ExpandedHomeTeam,
+		        "away_team",
+		        {
+		            "away_team_id", "away_team_name"
+		        },
+		        {
+		            "AwayTeamID", "AwayTeamName"
+		        }
+		    ),
+		    RenamedColumns = Table.RenameColumns(
+		        ExpandedAwayTeam,
+		        {
+		            {"match_id", "MatchID"},
+		            {"match_date", "MatchDate"},
+		            {"home_score", "HomeScore"},
+		            {"away_score", "AwayScore"}
+		        }
+		    ),
+		    // TODO: Organize funtions and move to top of script
+		    IsInvalidScore = (Score as nullable number) as logical =>
+		        if Score = null then
+		            true
+		        else
+		            Score < ProjectConfig[MinimumScore]
+		            or Number.Mod(Score, 1) <> 0,
+		    InvalidRows = Table.SelectRows(
+		        RenamedColumns,
+		        each
+		            [MatchID] = null
+		                or [MatchDate] = null
+		                or [Stage] = null
+		                or [Stage] = ""
+		                or [HomeTeamName] = null
+		                or [AwayTeamName] = null
+		                or [HomeTeamID] = null
+		                or [AwayTeamID] = null
+		                or [HomeTeamName] = ""
+		                or [AwayTeamName] = ""
+		                or [HomeTeamID] = [AwayTeamID]
+		                or IsInvalidScore([HomeScore])
+		                or IsInvalidScore([AwayScore])
+		    ),
+		    // TODO: Valdate thoroughly. May be a source of issues downstream.
+		    TypedMatches =Table.TransformColumnTypes(
+		        RenamedColumns,
+		        {
+		            {
+		                "MatchID", Int64.Type
+		            },
+		            {
+		                "MatchDate", type date
+		            },
+		            {
+		                "Stage", type text
+		            },
+		            {
+		                "HomeTeamID", Int64.Type
+		            },
+		            {
+		                "HomeTeamName", type text
+		            },
+		            {
+		                "AwayTeamID", Int64.Type
+		            },
+		            {
+		                "AwayTeamName", type text
+		            },
+		            {
+		                "HomeScore", Int64.Type
+		            },
+		            {
+		                "AwayScore", Int64.Type
+		            }
+		        },
+		        ProjectConfig[MatchDateCulture]
+		    ),
+		    HasDuplicateMatchIDs = Table.RowCount(TypedMatches) <> List.Count(List.Distinct(TypedMatches[MatchID])),
+		    Output =
+		        if not Table.IsEmpty(InvalidRows) then error "Match catalog has invalid teams, dates, or scores."
+		        else if HasDuplicateMatchIDs then error "The match catalog has duplicate MatchID values."
+		        else TypedMatches
+		in
+		    Output
+		    // TypedMatches
+		    // InvalidRows
+		```
+	lineageTag: 201913b2-8a05-473b-a416-bd98ff8a5fe0
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression StgShots = ```
+		let
+			// NOTE: This is an **awful workaround** to firewall restrictions that prevent consumption of StgMatches
+			// OBVIOUS RISK: Branching of logic in Matches between StgMatches and StgShots
+			// TODO: At a minimum, wrap both staging scripts into functions that lead to the same result, preventing branching
+			// FOR NOW: Out of time, need to capture enhancement and continue with duct-tape solution below.
+			MatchLimit = ProjectConfig[MatchLimit],
+			CheckedMatchLimit = 
+				if MatchLimit = null then
+					null
+				else if not Value.Is(MatchLimit, type number) then
+					error "ProjectConfig MatchLimit be null (release) or a positive whole number (dev)"
+				else if MatchLimit >= ProjectConfig[MinimumMatchLimit]
+				then
+					MatchLimit
+				else
+					error "ProjectConfig MatchLimit be null (release) or a positive whole number (dev)",
+			MatchCatalogPath = Text.Combine(
+				{
+					ProjectConfig[SourceRepository],
+					ProjectConfig[SourceRef],
+					ProjectConfig[MatchCatalogPath],
+					Text.From(ProjectConfig[CompetitionID]),
+					Text.From(ProjectConfig[SeasonID]) & ".json"
+		
+				},
+				"/"
+			),
+			MatchCatalogSource = fxGetJson(MatchCatalogPath),
+			CheckedMatchCatalog = 
+				if not Value.Is(MatchCatalogSource, type list) then
+					error "The Match catalog response is not a JSON list."
+				else if List.IsEmpty(MatchCatalogSource) then
+					error "The match catalog is empty."
+				else MatchCatalogSource,
+			MatchCatalog = Table.FromRecords(CheckedMatchCatalog),
+			LimitedMatchCatalog = 
+				if CheckedMatchLimit = null then
+					MatchCatalog
+				else
+					Table.FirstN(MatchCatalog, CheckedMatchLimit),
+			MatchIDs = Table.TransformColumnTypes(
+				Table.RenameColumns(
+					Table.SelectColumns(
+						LimitedMatchCatalog,
+						{"match_id"}
+					),
+					{
+						{"match_id", "MatchID"}
+					}
+				),
+				{
+					{"MatchID", Int64.Type}
+				}
+			),
+			AddedEvents = Table.AddColumn(
+				MatchIDs,
+				"Events",
+				each fxGetJson(Text.Combine(
+					{
+						ProjectConfig[SourceRepository],
+						ProjectConfig[SourceRef],
+						ProjectConfig[EventPath],
+						Text.From([MatchID]) & ".json"
+					},
+				"/")),
+				type list
+			),
+			EmptyEventFiles = Table.SelectRows(AddedEvents, each List.IsEmpty([Events])),
+			CheckedEvents = 
+				if not Table.IsEmpty(EmptyEventFiles) then error "One of the events files is empty."
+				else AddedEvents,
+			EventRows = Table.ExpandListColumn(CheckedEvents, "Events"),
+			AddedEventType = Table.AddColumn(
+				EventRows, "EventType", each [Events][type][name], type text
+			),
+			ShotEvents = Table.SelectRows(
+				AddedEventType,
+				each [EventType] = ProjectConfig[ShotEventName]
+			),
+			ExpandedShots = Table.ExpandRecordColumn(
+				ShotEvents,
+				"Events",
+				{"id", "period", "team", "shot"},
+				{"ShotID", "Period", "Team", "Shot"}
+			),
+			InvalidPeriods = Table.SelectRows(
+				ExpandedShots,
+				each
+					[Period] = null or not Value.Is([Period], type number)
+			),
+			CheckedPeriods =
+				if not Table.IsEmpty(InvalidPeriods)
+				then error "A shot has a blank or is not a number."
+				else
+					ExpandedShots,
+			NonShootoutShots = Table.SelectRows(
+				CheckedPeriods,
+				each
+					[Period] <> ProjectConfig[ShootoutPeriod]
+			),
+			ExpandedTeam = Table.ExpandRecordColumn(
+				NonShootoutShots, 
+				"Team",
+				{"id"}, {"TeamID"}
+			),
+			ExpandedShot = Table.ExpandRecordColumn(
+				ExpandedTeam,
+				"Shot",
+				{"statsbomb_xg", "outcome"},
+				{"ExpectedGoals", "ShotOutcome"}
+			),
+			ExpandedOutcome = Table.ExpandRecordColumn(
+				ExpandedShot,
+				"ShotOutcome",
+				{"name"}, {"ShotOutcome"}
+			),
+			CleanedOutcome = Table.TransformColumns(
+				ExpandedOutcome,
+				{
+					"ShotOutcome",
+					each
+						if _ = "Off T" then "Off target"
+						else if _ = "Saved Off Target" then "Saved off target"
+						else if _ = "Saved to Post" then "Saved to post"
+						else _,
+					type text
+				}
+			),
+			SelectedShots = Table.SelectColumns(
+				CleanedOutcome,
+				{
+					"ShotID", "MatchID", "TeamID", "ExpectedGoals", "ShotOutcome"
+				}
+			)
+		in
+			SelectedShots
+			// AddedEvents
+			// EventRows
+		```
+	lineageTag: d7638c7b-4fc7-4a54-a6bc-f716e4732051
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

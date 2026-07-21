@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "da1478921dc864dd13a3",
+  "position": {
+    "x": 0,
+    "y": 53.333333333333336,
+    "z": 2002,
+    "height": 34.666666666666664,
+    "width": 789.33333333333337,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Per match  |  teams split by whether they scored more or fewer than expected",
+                    "textStyle": {
+                      "fontFamily": "Consolas",
+                      "fontSize": "12pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

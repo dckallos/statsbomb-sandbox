@@ -1,0 +1,16 @@
+relationship 5640142a-fed5-301a-8e70-abeb5e952ed1
+	fromColumn: FactTeamMatch.TeamID
+	toColumn: DimTeam.TeamID
+
+relationship 4c4ff282-6159-9fa9-9716-42e6841448d8
+	fromColumn: FactTeamMatch.MatchID
+	toColumn: DimMatch.MatchID
+
+relationship 4f9ab32e-ddce-d99b-756e-962eab5d7ed1
+	fromColumn: FactShot.TeamID
+	toColumn: DimTeam.TeamID
+
+relationship 31ecdeff-385e-6721-c74f-6176d0825ab4
+	fromColumn: FactShot.MatchID
+	toColumn: DimMatch.MatchID
+

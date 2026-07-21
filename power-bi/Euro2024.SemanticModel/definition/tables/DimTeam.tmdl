@@ -1,0 +1,58 @@
+table DimTeam
+	lineageTag: 0bf18fab-9a06-4429-8022-e53e416a56a1
+
+	column TeamID
+		dataType: int64
+		formatString: 0
+		lineageTag: 7b8a97c8-83f6-4609-9fbd-7cd30250463a
+		summarizeBy: none
+		sourceColumn: TeamID
+
+		annotation SummarizationSetBy = Automatic
+
+	column TeamName
+		dataType: string
+		lineageTag: 1a19a04f-c385-4bfc-8750-25e84637de00
+		summarizeBy: none
+		sourceColumn: TeamName
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimTeam = m
+		mode: import
+		source =
+				let
+					HomeTeams = Table.RenameColumns(
+						Table.SelectColumns(StgMatches, {"HomeTeamID", "HomeTeamName"}),
+						{
+							{"HomeTeamID", "TeamID"},
+							{"HomeTeamName", "TeamName"}
+						}
+					),
+					AwayTeams = Table.RenameColumns(
+						Table.SelectColumns(StgMatches, {"AwayTeamID", "AwayTeamName"}),
+						{
+							{"AwayTeamID", "TeamID"},
+							{"AwayTeamName", "TeamName"}
+						}
+					),
+					Teams = Table.Distinct(Table.Combine({HomeTeams, AwayTeams})),
+					InvalidRows = Table.SelectRows(
+						Teams,
+						each
+							[TeamID] = null
+								or [TeamName] = null
+								or [TeamName] = ""
+					),
+					HasDuplicateTeamIDs = Table.RowCount(Teams) <> List.Count(List.Distinct(Teams[TeamID])),
+					Output =
+						if not Table.IsEmpty(InvalidRows) then error "DimTeam has a blank key or name."
+						else if HasDuplicateTeamIDs then error "DimTeam has duplicate TeamID values or conflicting names."
+						else Teams
+				in
+					Output
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

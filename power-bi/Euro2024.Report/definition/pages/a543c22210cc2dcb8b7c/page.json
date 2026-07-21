@@ -1,8 +1,20 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "a543c22210cc2dcb8b7c",
-  "displayName": "Page 1",
-  "displayOption": "FitToPage",
+  "displayName": "Teams",
+  "displayOption": "ActualSize",
   "height": 720,
-  "width": 1280
+  "width": 1280,
+  "visualInteractions": [
+    {
+      "source": "0570b27a831e060e1126",
+      "target": "bc35a8891cbb964c0ed4",
+      "type": "NoFilter"
+    },
+    {
+      "source": "bc35a8891cbb964c0ed4",
+      "target": "0570b27a831e060e1126",
+      "type": "NoFilter"
+    }
+  ]
 }

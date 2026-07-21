@@ -1,0 +1,296 @@
+table FactTeamMatch
+	lineageTag: fa4ef1eb-ead3-45cd-83f6-cee4def13dad
+
+	measure 'Matches Played' =
+			
+			DISTINCTCOUNT (
+			    FactTeamMatch[MatchID]
+			)
+		formatString: 0
+		lineageTag: 7bc9c550-1d26-429e-919d-5241bfcbbe61
+
+	measure 'Goals Scored' =
+			
+			SUM (
+			    FactTeamMatch[GoalsFor]
+			)
+		formatString: 0
+		lineageTag: 55b4fe86-7217-4c94-bb83-521e20431c39
+
+	measure 'Goals Against' =
+			
+			SUM (
+			    FactTeamMatch[GoalsAgainst]
+			)
+		formatString: 0
+		lineageTag: 08e2a8a2-6090-4440-ac46-212346bd07fe
+
+	measure 'Goals per Match' =
+			
+			DIVIDE (
+			    [Goals Scored],
+			    [Matches Played]
+			)
+		formatString: 0.00
+		lineageTag: 0d8343ac-943c-4dce-a1c2-cc43b2f92ca4
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Expected Goals per Match' =
+			
+			DIVIDE (
+			    [Expected Goals],
+			    [Matches Played]
+			)
+		formatString: 0.00
+		lineageTag: 4fef8209-fb7f-44e5-af56-2188e5771a6c
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Goals Minus Expected per Match' =
+			
+			IF (
+			    ISBLANK ( [Matches Played] ),
+			    BLANK (),
+			    [Goals per Match] - [Expected Goals per Match]
+			)
+		formatString: +0.00;-0.00;0.00
+		lineageTag: d61e105d-46e3-415b-a887-759458e209af
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Expected Goals' =
+			
+			IF (
+			    [Matches Played] > 0,
+			    COALESCE (
+			        SUM (
+			            FactShot[ExpectedGoals]
+			        ),
+			        0
+			    )
+			)
+		formatString: 0.00
+		lineageTag: 351cac2f-4e80-409d-82ff-322b8a67cd33
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	column MatchID
+		dataType: int64
+		formatString: 0
+		lineageTag: c0c29bfc-35e5-49d0-9bd0-bbc909175266
+		summarizeBy: none
+		sourceColumn: MatchID
+
+		annotation SummarizationSetBy = Automatic
+
+	column TeamID
+		dataType: int64
+		formatString: 0
+		lineageTag: b84af3ad-49e1-4c6d-9152-82e7cf573054
+		summarizeBy: none
+		sourceColumn: TeamID
+
+		annotation SummarizationSetBy = Automatic
+
+	column OpponentTeamID
+		dataType: int64
+		formatString: 0
+		lineageTag: a496fae9-8d39-4be0-bec2-c926d12dce88
+		summarizeBy: count
+		sourceColumn: OpponentTeamID
+
+		annotation SummarizationSetBy = Automatic
+
+	column OpponentTeamName
+		dataType: string
+		lineageTag: a3ef7751-064c-4779-a55f-2e4433e49d00
+		summarizeBy: none
+		sourceColumn: OpponentTeamName
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsHome
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 26e02d28-671f-466c-b166-7341df614b02
+		summarizeBy: none
+		sourceColumn: IsHome
+
+		annotation SummarizationSetBy = Automatic
+
+	column GoalsFor
+		dataType: int64
+		formatString: 0
+		lineageTag: 88de26c0-2f3f-42bd-9a8d-8b7f7593be6d
+		summarizeBy: sum
+		sourceColumn: GoalsFor
+
+		annotation SummarizationSetBy = Automatic
+
+	column GoalsAgainst
+		dataType: int64
+		formatString: 0
+		lineageTag: 2150e849-7591-4027-a50a-bd2470fbbb96
+		summarizeBy: sum
+		sourceColumn: GoalsAgainst
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScoreLabel
+		dataType: string
+		lineageTag: 9203e7e2-9ccf-4283-af21-5ecb9573ea51
+		summarizeBy: none
+		sourceColumn: ScoreLabel
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactTeamMatch = m
+		mode: import
+		source = ```
+				let
+				    HomeBase = Table.RenameColumns(
+				        Table.SelectColumns(StgMatches, {
+				            "MatchID", "HomeTeamID", "AwayTeamID", "AwayTeamName", "HomeScore", "AwayScore"
+				        }),
+				        {
+				            {"HomeTeamID", "TeamID"}, {"AwayTeamID", "OpponentTeamID"},
+				            {"AwayTeamName", "OpponentTeamName"},
+				            {"HomeScore", "GoalsFor"}, {"AwayScore", "GoalsAgainst"}
+				        }
+				    ),
+				    HomeWithRole = Table.AddColumn(HomeBase, "IsHome", each true, type logical),
+				    HomeRows = Table.AddColumn(
+				        HomeWithRole,
+				        "ScoreLabel",
+				        each Text.From([GoalsFor]) & "–" & Text.From([GoalsAgainst]),
+				        type text
+				    ),
+				    AwayBase = Table.RenameColumns(
+				        Table.SelectColumns(StgMatches, {
+				            "MatchID", "AwayTeamID", "HomeTeamID", "HomeTeamName", "AwayScore", "HomeScore"
+				        }),
+				        {
+				            {"AwayTeamID", "TeamID"}, {"HomeTeamID", "OpponentTeamID"},
+				            {"HomeTeamName", "OpponentTeamName"},
+				            {"AwayScore", "GoalsFor"}, {"HomeScore", "GoalsAgainst"}
+				        }
+				    ),
+				    AwayWithRole = Table.AddColumn(AwayBase, "IsHome", each false, type logical),
+				    AwayRows = Table.AddColumn(
+				        AwayWithRole,
+				        "ScoreLabel",
+				        each Text.From([GoalsFor]) & "–" & Text.From([GoalsAgainst]),
+				        type text
+				    ),
+				    CombinedFact = Table.Combine({HomeRows, AwayRows}),
+				    FactRows = Table.SelectColumns(
+				        CombinedFact, {
+				            "MatchID", "TeamID", "OpponentTeamID", "OpponentTeamName",
+				            "IsHome", "GoalsFor", "GoalsAgainst", "ScoreLabel"
+				        }
+				    ),
+				    TypedFact = Table.TransformColumnTypes(
+				        FactRows, 
+				        {
+				            {"MatchID", Int64.Type}, 
+				            {"TeamID", Int64.Type},
+				            {"OpponentTeamID", Int64.Type}, 
+				            {"OpponentTeamName", type text},
+				            {"IsHome", type logical}, 
+				            {"GoalsFor", Int64.Type},
+				            {"GoalsAgainst", Int64.Type}, 
+				            {"ScoreLabel", type text}
+				        }
+				    ),
+				    InvalidRows = Table.SelectRows(
+				        TypedFact, 
+				        each
+				            [MatchID] = null 
+				                or [TeamID] = null 
+				                or [OpponentTeamID] = null
+				                or [OpponentTeamName] = null 
+				                or [OpponentTeamName] = "" 
+				                or [IsHome] = null
+				                or [GoalsFor] = null 
+				                or [GoalsAgainst] = null 
+				                or [ScoreLabel] = null
+				                or [TeamID] = [OpponentTeamID]
+				    
+				    ),
+				    DistinctKeys = Table.Distinct(
+				        Table.SelectColumns(TypedFact, {"MatchID", "TeamID"})
+				    ),
+				    MatchChecks = Table.Group(
+				        TypedFact, 
+				        {"MatchID"}, 
+				        {
+				            {"RowCount", each Table.RowCount(_), Int64.Type},
+				            {"TeamCount", each List.Count(List.Distinct([TeamID])), Int64.Type},
+				            {"HomeCount", each List.Count(List.Select([IsHome], each _ = true)), Int64.Type}
+				        }
+				    ),
+				    JoinedSource = Table.NestedJoin(
+				        TypedFact, {"MatchID"}, StgMatches, {"MatchID"}, "Source", JoinKind.LeftOuter),
+				    ExpandedSource = Table.ExpandTableColumn(
+				        JoinedSource,
+				        "Source",
+				        {"HomeTeamID", "HomeTeamName", "AwayTeamID", "AwayTeamName", "HomeScore", "AwayScore"},
+				        {"HomeTeamID", "HomeTeamName", "AwayTeamID", "AwayTeamName", "HomeScore", "AwayScore"}
+				    ),
+				    InvalidAssignments = Table.SelectRows(
+				        ExpandedSource, 
+				        each
+				            [HomeTeamID] = null 
+				                or [AwayTeamID] = null
+				        or (
+				            [IsHome] = true 
+				                and (
+				                    [TeamID] <> [HomeTeamID] 
+				                    or [OpponentTeamID] <> [AwayTeamID]
+				                    or [OpponentTeamName] <> [AwayTeamName]
+				                    or [GoalsFor] <> [HomeScore] 
+				                    or [GoalsAgainst] <> [AwayScore]
+				                    or [ScoreLabel] <> (
+				                        Text.From([HomeScore]) & "–" & Text.From([AwayScore])
+				                    )
+				            )
+				        )
+				        or (
+				            [IsHome] = false 
+				                and (
+				                    [TeamID] <> [AwayTeamID] 
+				                    or [OpponentTeamID] <> [HomeTeamID]
+				                    or [OpponentTeamName] <> [HomeTeamName]
+				                    or [GoalsFor] <> [AwayScore] 
+				                    or [GoalsAgainst] <> [HomeScore]
+				                    or [ScoreLabel] <> (
+				                        Text.From([AwayScore]) & "–" & Text.From([HomeScore])
+				                    )
+				            )
+				        )
+				    
+				    ),
+				    HasWrongRowCount =
+				        Table.RowCount(TypedFact) <> ProjectConfig[TeamsPerMatch] * Table.RowCount(StgMatches),
+				    HasDuplicateKeys = Table.RowCount(TypedFact) <> Table.RowCount(DistinctKeys),
+				    HasInvalidMatchCounts = not Table.IsEmpty(Table.SelectRows(MatchChecks, each
+				        [RowCount] <> ProjectConfig[TeamsPerMatch]
+				        or [TeamCount] <> ProjectConfig[TeamsPerMatch]
+				        or [HomeCount] <> 1
+				    )),
+				    Output =
+				        if not Table.IsEmpty(InvalidRows) then error "FactTeamMatch has a blank or invalid required value."
+				        else if HasWrongRowCount or HasDuplicateKeys or HasInvalidMatchCounts then
+				            error "FactTeamMatch must have two unique team rows and one home row per match."
+				        else if not Table.IsEmpty(InvalidAssignments) then
+				            error "FactTeamMatch roles, opponents, scores, or labels do not mirror StgMatches."
+				        else TypedFact
+				in
+				    Output
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
